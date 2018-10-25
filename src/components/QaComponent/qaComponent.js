@@ -28,20 +28,17 @@ class QaComponent extends Component {
             questionNumber : this.state.questionNumber
         }
 
-        let arrList = this.state.answerList;
-        const index = arrList.indexOf(ans);
-        if (index != -1) {
-            arrList.splice(index, 1);
-        }
+        let answerList = this.state.answerList;
+        answerList[this.state.questionNumber-1] = ans;
 
-        let arrSelectButton = this.state.selectButton;
-        arrSelectButton.forEach((item, index) => {
-            arrSelectButton[index] = (index === selectedAnswer-1) ? 1 : 0;
+        let selectButton = this.state.selectButton;
+        selectButton.forEach((item, index) => {
+            selectButton[index] = (index === selectedAnswer-1) ? 1 : 0;
         });
         
         this.setState({
-            answerList: [...arrList, ans],
-            selectButton: arrSelectButton
+            answerList,
+            selectButton
         });
     }
 

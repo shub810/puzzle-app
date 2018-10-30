@@ -35,6 +35,13 @@
     transform: translate(-50%,-20%);
 }
 
+.pos_abs_next {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    transform: translate(0,-20%);
+}
+
 .next_btn{
     background: #c2db38;
     font-size: 20px;

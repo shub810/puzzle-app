@@ -9,3 +9,10 @@ export function getQAList() {
         payload: request
     }
 }
+
+export function addList(obj) {
+    return {
+        type: 'ADD_TO_LIST',
+        payload: obj
+    }
+}

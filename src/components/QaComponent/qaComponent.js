@@ -1,7 +1,7 @@
 import React, { Component, Fragment } from 'react';
 import { bindActionCreators } from 'redux';
 import { connect } from 'react-redux';
-import { getQAList } from '../../actions/index';
+import { getQAList, addList } from '../../actions/index';
 
 import Question from './question';
 import Result from "./result";
@@ -12,39 +12,39 @@ class QaComponent extends Component {
 
     state = {
         questionNumber: 1,
-        answerList: [],
         isFinished: false,
         nextLabel : 'Next',
-        selectButton: [0,0,0,0]
+        selectButton: [0,0,0,0],
+        selectedAns: {}
     }
 
     componentDidMount() {
         this.props.getQAList();
     }
 
-    onClickHandler = (e, selectedAnswer) => {
-        const ans = {
-            selectedAnswer,            
+    onClickHandler = (e) => {
+        const selectedAns = {
+            selectedAnswer: Number(e.target.value),           
             questionNumber : this.state.questionNumber
         }
 
-        let answerList = this.state.answerList;
-        answerList[this.state.questionNumber-1] = ans;
-
         let selectButton = this.state.selectButton;
         selectButton.forEach((item, index) => {
-            selectButton[index] = (index === selectedAnswer-1) ? 1 : 0;
+            selectButton[index] = (index === Number(e.target.value)-1) ? 1 : 0;
         });
         
         this.setState({
-            answerList,
-            selectButton
+            selectButton,
+            selectedAns
         });
     }
 
     onNextHandler = () => {
         const index = this.state.selectButton.indexOf(1);
         if (index !== -1) {
+
+            this.props.addList(this.state.selectedAns);
+
             this.setState({
                 selectButton: [0,0,0,0],
                 questionNumber : this.state.questionNumber + 1,
@@ -55,6 +55,7 @@ class QaComponent extends Component {
     }
 
     render() {
+
         const { qaList } = this.props;
         const { questionNumber } =  this.state;
         
@@ -69,21 +70,20 @@ class QaComponent extends Component {
                         <Fragment>
                             <h3 className={styles.qanumber}>Javascript Quiz {questionNumber} of {qaList.length}</h3>
                             <Question data={qaList[questionNumber - 1]} />
-                            <div className={styles.pos_abs}>
-                                <button className={styles.btn + " " + (this.state.selectButton[0] ? styles.selectedAns : styles.bg_trans)} onClick={(e) => this.onClickHandler(e, 1)}>A</button>
-                                <button className={styles.btn + " " + (this.state.selectButton[1] ? styles.selectedAns : styles.bg_trans)} onClick={(e) => this.onClickHandler(e, 2)}>B</button>
-                                <button className={styles.btn + " " + (this.state.selectButton[2] ? styles.selectedAns : styles.bg_trans)} onClick={(e) => this.onClickHandler(e, 3)}>C</button>
-                                <button className={styles.btn + " " + (this.state.selectButton[3] ? styles.selectedAns : styles.bg_trans)} onClick={(e) => this.onClickHandler(e, 4)}>D</button>
-                                <button className={styles.next_btn} onClick={this.onNextHandler}>{this.state.nextLabel}</button>
+                            <div className={styles.pos_abs} onClick={this.onClickHandler}>
+                                <button className={styles.btn + " " + (this.state.selectButton[0] ? styles.selectedAns : styles.bg_trans)} value={1}>A</button>
+                                <button className={styles.btn + " " + (this.state.selectButton[1] ? styles.selectedAns : styles.bg_trans)} value={2}>B</button>
+                                <button className={styles.btn + " " + (this.state.selectButton[2] ? styles.selectedAns : styles.bg_trans)} value={3}>C</button>
+                                <button className={styles.btn + " " + (this.state.selectButton[3] ? styles.selectedAns : styles.bg_trans)} value={4}>D</button>
                             </div>
-                            <div>
-                                
+                            <div className={styles.pos_abs_next}>
+                                <button className={styles.next_btn} onClick={this.onNextHandler}>{this.state.nextLabel}</button>
                             </div>
                         </Fragment>
                     )
                     :
                     (
-                        <Result answerList={this.state.answerList} data={qaList}/>
+                        <Result answerList={this.props.ansList} data={qaList}/>
                     )
                 }
             </div>
@@ -93,12 +93,13 @@ class QaComponent extends Component {
 
 function mapStateToProps(state) {
     return {
-        qaList: state.qaList
+        qaList: state.qaList,
+        ansList: state.ansList
     }
 }
 
 function mapDispatchToProps(dispatch) {
-    return bindActionCreators({ getQAList }, dispatch);
+    return bindActionCreators({ getQAList, addList }, dispatch);
 }
 
 export default connect(mapStateToProps,mapDispatchToProps)(QaComponent);
